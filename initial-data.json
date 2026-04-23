@@ -1,0 +1,131 @@
+{
+  "terms": [
+    "1st Fall",
+    "1st Spring",
+    "1st Summer",
+    "2nd Fall",
+    "2nd Spring",
+    "2nd Summer",
+    "3rd Fall",
+    "3rd Spring",
+    "3rd Summer",
+    "4th Fall",
+    "4th Spring",
+    "4th Summer",
+    "5th Fall",
+    "5th Spring"
+  ],
+  "students": [
+    {
+      "name": "Yuxuan Liang",
+      "roles": {
+        "1st Fall": "RA",
+        "1st Spring": "RA",
+        "1st Summer": "RA",
+        "2nd Fall": "RA",
+        "2nd Spring": "RA",
+        "2nd Summer": "RA",
+        "3rd Fall": "RA",
+        "3rd Spring": "RA",
+        "3rd Summer": "TA",
+        "4th Fall": "TA",
+        "4th Spring": "RA"
+      }
+    },
+    {
+      "name": "Derik",
+      "roles": {
+        "1st Fall": "RA",
+        "1st Spring": "RA",
+        "1st Summer": "RA",
+        "2nd Fall": "RA",
+        "2nd Spring": "RA",
+        "2nd Summer": "RA",
+        "3rd Fall": "RA",
+        "3rd Spring": "RA",
+        "3rd Summer": "RA",
+        "4th Fall": "TA",
+        "4th Spring": "TA"
+      }
+    },
+    {
+      "name": "Jason",
+      "roles": {
+        "1st Fall": "RA",
+        "1st Spring": "TA",
+        "1st Summer": "RA",
+        "2nd Fall": "RA",
+        "2nd Spring": "TA"
+      }
+    },
+    {
+      "name": "Manik",
+      "roles": {
+        "1st Fall": "TA",
+        "1st Spring": "TA",
+        "1st Summer": "TA",
+        "2nd Fall": "TA",
+        "2nd Spring": "TA"
+      }
+    },
+    {
+      "name": "Zabirul",
+      "roles": {
+        "1st Fall": "TA",
+        "1st Spring": "TA",
+        "1st Summer": "TA",
+        "2nd Fall": "TA",
+        "2nd Spring": "TA",
+        "2nd Summer": "RA",
+        "3rd Fall": "RA",
+        "3rd Spring": "RA"
+      }
+    },
+    {
+      "name": "Wasif",
+      "roles": {
+        "1st Fall": "RA",
+        "1st Spring": "RA"
+      }
+    },
+    {
+      "name": "Hao",
+      "roles": {
+        "1st Fall": "RA"
+      }
+    },
+    {
+      "name": "Marshal",
+      "roles": {
+        "1st Fall": "TA"
+      }
+    }
+  ],
+  "credentials": {
+    "Yuxuan Liang": "liangy15",
+    "Derik": "azamm",
+    "Jason": "wangj68",
+    "Manik": "manikm",
+    "Zabirul": "islamm11",
+    "Wasif": "nafeem",
+    "Hao": "gongh2",
+    "Marshal": "shawkm"
+  },
+  "labRatioExclusions": {
+    "Manik": [
+      "1st Fall",
+      "1st Spring",
+      "1st Summer",
+      "2nd Fall"
+    ],
+    "Zabirul": [
+      "1st Fall",
+      "1st Spring",
+      "1st Summer",
+      "2nd Fall",
+      "2nd Spring",
+      "2nd Summer",
+      "3rd Fall"
+    ]
+  }
+}

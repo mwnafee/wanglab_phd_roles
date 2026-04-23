@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TARA Lab Roles Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="app-header">
+      <div>
+        <h1>TA / RA Dashboard</h1>
+        <p>Excel-style semester map, sortable student ratios, and lab-wide TA / RA summary.</p>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <section class="workspace">
+        <div class="toolbar">
+          <div class="view-switch" role="tablist" aria-label="Dashboard views">
+            <button class="view-button is-active" id="excel-view-button" data-view="excel" type="button">Excel View</button>
+            <button class="view-button" id="ratio-view-button" data-view="ratio" type="button">Ratio View</button>
+          </div>
+
+          <div class="sort-controls" id="sort-controls" hidden>
+            <label for="ratio-sort">Sort by</label>
+            <select id="ratio-sort">
+              <option value="ta-desc">Highest TA ratio</option>
+              <option value="ta-asc">Lowest TA ratio</option>
+              <option value="name-asc">Name A-Z</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="legend">
+          <span class="legend-item"><span class="swatch swatch-ta"></span>TA</span>
+          <span class="legend-item"><span class="swatch swatch-ra"></span>RA</span>
+          <span class="legend-item"><span class="swatch swatch-excluded"></span>Excluded from lab ratio: Manik first 4 columns, Zabirul first 7 columns</span>
+        </div>
+
+        <section class="panel main-panel">
+          <div id="excel-view" class="view-panel"></div>
+          <div id="ratio-view" class="view-panel" hidden></div>
+        </section>
+      </section>
+
+      <aside class="sidebar">
+        <section class="panel summary-panel">
+          <h2>TA / RA Ratio</h2>
+          <div id="lab-ratio-summary"></div>
+          <p class="summary-note">
+            Whole-lab calculation ignores the orange cells only.
+          </p>
+        </section>
+
+        <section class="panel form-panel">
+          <h2>Student Entry</h2>
+          <form id="role-form">
+            <label for="nickname">Nickname</label>
+            <select id="nickname" name="nickname" required></select>
+
+            <label for="semester">Semester</label>
+            <select id="semester" name="semester" required></select>
+
+            <label for="role">TA / RA</label>
+            <select id="role" name="role" required>
+              <option value="TA">TA</option>
+              <option value="RA">RA</option>
+            </select>
+
+            <label for="rcsId">RCS ID</label>
+            <input id="rcsId" name="rcsId" type="password" autocomplete="off" required placeholder="Enter your RCS ID">
+
+            <button class="submit-button" type="submit">Save Entry</button>
+          </form>
+          <p id="form-message" class="form-message" aria-live="polite"></p>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
