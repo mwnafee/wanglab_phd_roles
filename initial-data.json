@@ -111,21 +111,5 @@
     "Hao": "gongh2",
     "Marshal": "shawkm"
   },
-  "labRatioExclusions": {
-    "Manik": [
-      "1st Fall",
-      "1st Spring",
-      "1st Summer",
-      "2nd Fall"
-    ],
-    "Zabirul": [
-      "1st Fall",
-      "1st Spring",
-      "1st Summer",
-      "2nd Fall",
-      "2nd Spring",
-      "2nd Summer",
-      "3rd Fall"
-    ]
-  }
+  "labRatioExclusions": {}
 }
