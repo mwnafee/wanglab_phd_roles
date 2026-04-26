@@ -176,10 +176,7 @@ function buildExclusionRules(config) {
     );
   }
 
-  return {
-    Manik: new Set(terms.slice(0, 4)),
-    Zabirul: new Set(terms.slice(0, 7)),
-  };
+  return {};
 }
 
 function cloneStudents(students) {
