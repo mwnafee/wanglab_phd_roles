@@ -187,6 +187,51 @@ async function getInstallationToken(env) {
   return tokenPayload.token;
 }
 
+// This endpoint intentionally exposes no secret material. It lets an admin
+// confirm that the deployed Worker has the expected App identifier and key.
+async function healthCheck(env) {
+  const pem = String(env.GITHUB_APP_PRIVATE_KEY || "").trim();
+  const appIdentifier = String(env.GITHUB_APP_ID || "").trim();
+  const keyFormat = pem.includes("-----BEGIN RSA PRIVATE KEY-----")
+    ? "PKCS#1 RSA"
+    : pem.includes("-----BEGIN PRIVATE KEY-----")
+      ? "PKCS#8"
+      : "unrecognized";
+
+  try {
+    const jwt = await signGitHubAppJwt(appIdentifier, pem);
+    const response = await fetch(`${GITHUB_API}/app`, {
+      headers: githubHeaders(jwt),
+    });
+    const body = await response.text();
+    let github;
+    try {
+      github = JSON.parse(body);
+    } catch {
+      github = { response: body };
+    }
+
+    return jsonResponse({
+      ok: response.ok,
+      githubStatus: response.status,
+      configuredAppIdentifier: appIdentifier,
+      keyFormat,
+      keyFingerprint: await sha256(pem),
+      githubAppId: github.id || null,
+      githubClientId: github.client_id || null,
+      githubMessage: github.message || null,
+    }, response.ok ? 200 : 502);
+  } catch (error) {
+    return jsonResponse({
+      ok: false,
+      configuredAppIdentifier: appIdentifier,
+      keyFormat,
+      keyFingerprint: await sha256(pem),
+      error: error.message || "Health check failed.",
+    }, 500);
+  }
+}
+
 async function getRepoFile(token, env, path) {
   const res = await fetch(`${GITHUB_API}/repos/${env.GITHUB_REPO}/contents/${path}`, {
     headers: githubHeaders(token),
@@ -268,8 +313,13 @@ async function handleUpdate(request, env) {
 
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
     if (request.method === "OPTIONS") {
       return jsonResponse({ ok: true });
+    }
+
+    if (request.method === "GET" && url.pathname === "/health") {
+      return healthCheck(env);
     }
 
     if (request.method !== "POST") {
