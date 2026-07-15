@@ -1,0 +1,84 @@
+name: Update TA RA Roles
+
+on:
+  workflow_dispatch:
+    inputs:
+      nickname:
+        description: Student nickname
+        required: true
+        type: string
+      semester:
+        description: Semester to update
+        required: true
+        type: string
+      role:
+        description: TA or RA
+        required: true
+        type: choice
+        options:
+          - TA
+          - RA
+      rcsId:
+        description: RCS ID password
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  update-role:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update JSON
+        env:
+          NICKNAME: ${{ inputs.nickname }}
+          SEMESTER: ${{ inputs.semester }}
+          ROLE: ${{ inputs.role }}
+          RCS_ID: ${{ inputs.rcsId }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          p = Path("initial-data.json")
+          data = json.loads(p.read_text())
+
+          credentials = data.get("credentials", {})
+          nickname = os.environ["NICKNAME"].strip()
+          semester = os.environ["SEMESTER"].strip()
+          role = os.environ["ROLE"].strip().upper()
+          rcs_id = os.environ["RCS_ID"].strip()
+
+          if nickname not in credentials:
+              raise SystemExit("Unknown nickname")
+          if semester not in data.get("terms", []):
+              raise SystemExit("Invalid semester")
+          if role not in {"TA", "RA"}:
+              raise SystemExit("Invalid role")
+          if credentials[nickname] != rcs_id:
+              raise SystemExit("RCS ID did not match nickname")
+
+          students = data.get("students", [])
+          for student in students:
+              if student.get("name") == nickname:
+                  student.setdefault("roles", {})[semester] = role
+                  break
+          else:
+              raise SystemExit("Student not found")
+
+          p.write_text(json.dumps(data, indent=2) + "\n")
+          PY
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add initial-data.json
+          git commit -m "Update TA RA role" || exit 0
+          git push

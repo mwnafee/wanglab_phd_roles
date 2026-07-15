@@ -1,4 +1,5 @@
 const STORAGE_KEY = "taraRoleDashboardEntries";
+const APP_CONFIG = window.APP_CONFIG || {};
 
 let terms = [
   "1st Fall",
@@ -176,7 +177,10 @@ function buildExclusionRules(config) {
     );
   }
 
-  return {};
+  return {
+    Manik: new Set(terms.slice(0, 4)),
+    Zabirul: new Set(terms.slice(0, 7)),
+  };
 }
 
 function cloneStudents(students) {
@@ -256,12 +260,48 @@ function bindForm() {
       return;
     }
 
-    student.roles[semester] = role;
-    saveStudents();
-    render();
-    document.getElementById("rcsId").value = "";
-    setFormMessage(`${nickname}'s ${semester} entry was saved as ${role}.`, true);
+    submitRoleUpdate({ nickname, semester, role, rcsId });
   });
+}
+
+async function submitRoleUpdate(payload) {
+  if (APP_CONFIG.updateUrl) {
+    try {
+      setFormMessage("Saving...", true);
+      const response = await fetch(APP_CONFIG.updateUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result.error || "Entry not saved.");
+      }
+
+      if (Array.isArray(result.students)) {
+        seedStudents = result.students;
+        state.students = cloneStudents(result.students);
+        render();
+      }
+
+      document.getElementById("rcsId").value = "";
+      setFormMessage(result.message || "Entry saved.", true);
+      return;
+    } catch (error) {
+      setFormMessage(error.message || "Entry not saved.", false);
+      return;
+    }
+  }
+
+  const student = state.students.find((entry) => entry.name === payload.nickname);
+  student.roles[payload.semester] = payload.role;
+  saveStudents();
+  render();
+  document.getElementById("rcsId").value = "";
+  setFormMessage(`${payload.nickname}'s ${payload.semester} entry was saved as ${payload.role}.`, true);
 }
 
 function setFormMessage(text, isSuccess) {
