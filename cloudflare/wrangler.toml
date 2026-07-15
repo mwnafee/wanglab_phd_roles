@@ -1,0 +1,7 @@
+name = "wanglab-phd-roles"
+main = "worker.js"
+compatibility_date = "2026-07-14"
+
+[vars]
+GITHUB_REPO = "mwnafee/wanglab_phd_roles"
+GITHUB_BRANCH = "main"
