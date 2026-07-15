@@ -61,8 +61,6 @@
     {
       "name": "Manik",
       "roles": {
-        "1st Fall": "TA",
-        "1st Spring": "TA",
         "1st Summer": "TA",
         "2nd Fall": "TA",
         "2nd Spring": "TA",
@@ -72,8 +70,6 @@
     {
       "name": "Zabirul",
       "roles": {
-        "1st Fall": "TA",
-        "1st Spring": "TA",
         "1st Summer": "TA",
         "2nd Fall": "TA",
         "2nd Spring": "TA",
@@ -120,18 +116,24 @@
       "4th Spring"
     ],
     "Manik": [
-      "1st Fall",
-      "1st Spring",
       "1st Summer",
       "2nd Fall",
       "2nd Spring"
     ],
     "Zabirul": [
-      "1st Fall",
-      "1st Spring",
       "1st Summer",
       "2nd Fall",
       "2nd Spring"
+    ]
+  },
+  "beforeJoiningTerms": {
+    "Manik": [
+      "1st Fall",
+      "1st Spring"
+    ],
+    "Zabirul": [
+      "1st Fall",
+      "1st Spring"
     ]
   }
 }

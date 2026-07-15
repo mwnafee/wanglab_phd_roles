@@ -7,7 +7,10 @@
   --line: #d8e1e8;
   --ta: #68bd70;
   --ra: #f0d85e;
+  --ta-summer: #44a85b;
+  --ra-summer: #ddb82e;
   --excluded: #f4a259;
+  --before-joining: #d6dde4;
   --accent: #1e6676;
   --accent-dark: #164d59;
   --danger: #b83b35;
@@ -194,6 +197,10 @@ input:focus {
   background: var(--excluded);
 }
 
+.swatch-before-joining {
+  background: var(--before-joining);
+}
+
 .table-wrap {
   overflow: auto;
   border: 1px solid var(--line);
@@ -256,8 +263,21 @@ th:first-child {
   color: #9aa7b2;
 }
 
+.role-before-joining {
+  background: var(--before-joining);
+  color: #6a7885;
+}
+
 .is-excluded {
   background: var(--excluded);
+}
+
+.role-ta.is-summer {
+  background: var(--ta-summer);
+}
+
+.role-ra.is-summer {
+  background: var(--ra-summer);
 }
 
 .ratio-grid {

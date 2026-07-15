@@ -77,18 +77,15 @@ let seedStudents = [
   {
     name: "Manik",
     roles: {
-      "1st Fall": "TA",
-      "1st Spring": "TA",
       "1st Summer": "TA",
       "2nd Fall": "TA",
       "2nd Spring": "TA",
+      "2nd Summer": "RA",
     },
   },
   {
     name: "Zabirul",
     roles: {
-      "1st Fall": "TA",
-      "1st Spring": "TA",
       "1st Summer": "TA",
       "2nd Fall": "TA",
       "2nd Spring": "TA",
@@ -119,6 +116,7 @@ let seedStudents = [
 ];
 
 let exclusionRules = buildExclusionRules();
+let beforeJoiningRules = buildBeforeJoiningRules();
 
 const state = {
   students: [],
@@ -164,6 +162,9 @@ async function loadInitialData() {
       exclusionRules = payload.labRatioExclusions
         ? buildExclusionRules(payload.labRatioExclusions)
         : buildExclusionRules();
+      beforeJoiningRules = payload.beforeJoiningTerms
+        ? buildBeforeJoiningRules(payload.beforeJoiningTerms)
+        : buildBeforeJoiningRules();
     }
   } catch (error) {
     setFormMessage("Using built-in starter data because initial-data.json could not be loaded.", false);
@@ -180,6 +181,19 @@ function buildExclusionRules(config) {
   return {
     Manik: new Set(terms.slice(0, 4)),
     Zabirul: new Set(terms.slice(0, 7)),
+  };
+}
+
+function buildBeforeJoiningRules(config) {
+  if (config) {
+    return Object.fromEntries(
+      Object.entries(config).map(([name, excludedTerms]) => [name, new Set(excludedTerms)])
+    );
+  }
+
+  return {
+    Manik: new Set(["1st Fall", "1st Spring"]),
+    Zabirul: new Set(["1st Fall", "1st Spring"]),
   };
 }
 
@@ -346,9 +360,13 @@ function renderExcelView() {
       const cells = terms.map((term) => {
         const role = student.roles[term] || "";
         const excluded = isExcluded(student.name, term);
+        const beforeJoining = isBeforeJoining(student.name, term);
+        const isSummer = term.includes("Summer");
         const classes = ["role-cell"];
 
-        if (excluded) {
+        if (beforeJoining) {
+          classes.push("role-before-joining");
+        } else if (excluded) {
           classes.push("is-excluded");
         } else if (role === "TA") {
           classes.push("role-ta");
@@ -358,7 +376,11 @@ function renderExcelView() {
           classes.push("role-empty");
         }
 
-        return `<td class="${classes.join(" ")}">${role || "-"}</td>`;
+        if (isSummer) {
+          classes.push("is-summer");
+        }
+
+        return `<td class="${classes.join(" ")}">${beforeJoining ? "-" : role || "-"}</td>`;
       });
 
       return `<tr><td class="student-name">${escapeHtml(student.name)}</td>${cells.join("")}</tr>`;
@@ -508,6 +530,10 @@ function formatRatio(taCount, raCount) {
 
 function isExcluded(name, term) {
   return exclusionRules[name]?.has(term) || false;
+}
+
+function isBeforeJoining(name, term) {
+  return beforeJoiningRules[name]?.has(term) || false;
 }
 
 function escapeHtml(value) {
