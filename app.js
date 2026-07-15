@@ -191,6 +191,13 @@ function cloneStudents(students) {
 }
 
 function loadStudents() {
+  // Shared updates come from initial-data.json; old browser-only entries must
+  // not override the latest GitHub Pages deployment.
+  if (APP_CONFIG.updateUrl) {
+    localStorage.removeItem(STORAGE_KEY);
+    return cloneStudents(seedStudents);
+  }
+
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (!Array.isArray(saved)) {
@@ -285,6 +292,12 @@ async function submitRoleUpdate(payload) {
         seedStudents = result.students;
         state.students = cloneStudents(result.students);
         render();
+      } else {
+        const student = state.students.find((entry) => entry.name === payload.nickname);
+        if (student) {
+          student.roles[payload.semester] = payload.role;
+          render();
+        }
       }
 
       document.getElementById("rcsId").value = "";
