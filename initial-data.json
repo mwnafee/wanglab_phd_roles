@@ -61,6 +61,8 @@
     {
       "name": "Manik",
       "roles": {
+        "1st Fall": "TA",
+        "1st Spring": "TA",
         "1st Summer": "TA",
         "2nd Fall": "TA",
         "2nd Spring": "TA",
@@ -70,6 +72,7 @@
     {
       "name": "Zabirul",
       "roles": {
+        "1st Spring": "TA",
         "1st Summer": "TA",
         "2nd Fall": "TA",
         "2nd Spring": "TA",
@@ -132,7 +135,6 @@
       "1st Spring"
     ],
     "Zabirul": [
-      "1st Fall",
       "1st Spring"
     ]
   }

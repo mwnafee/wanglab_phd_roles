@@ -77,6 +77,8 @@ let seedStudents = [
   {
     name: "Manik",
     roles: {
+      "1st Fall": "TA",
+      "1st Spring": "TA",
       "1st Summer": "TA",
       "2nd Fall": "TA",
       "2nd Spring": "TA",
@@ -86,6 +88,7 @@ let seedStudents = [
   {
     name: "Zabirul",
     roles: {
+      "1st Spring": "TA",
       "1st Summer": "TA",
       "2nd Fall": "TA",
       "2nd Spring": "TA",
@@ -193,7 +196,7 @@ function buildBeforeJoiningRules(config) {
 
   return {
     Manik: new Set(["1st Fall", "1st Spring"]),
-    Zabirul: new Set(["1st Fall", "1st Spring"]),
+    Zabirul: new Set(["1st Spring"]),
   };
 }
 
@@ -380,7 +383,7 @@ function renderExcelView() {
           classes.push("is-summer");
         }
 
-        return `<td class="${classes.join(" ")}">${beforeJoining ? "-" : role || "-"}</td>`;
+        return `<td class="${classes.join(" ")}">${role || "-"}</td>`;
       });
 
       return `<tr><td class="student-name">${escapeHtml(student.name)}</td>${cells.join("")}</tr>`;
