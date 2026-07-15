@@ -142,7 +142,7 @@ async function getInstallationToken(env) {
 
   if (!installsRes.ok) {
     const text = await installsRes.text();
-    throw new Error(text || "Could not list GitHub App installations.");
+    throw new Error(`List GitHub App installations failed (${installsRes.status}): ${text || "no response body"}`);
   }
 
   const installations = await installsRes.json();
@@ -163,7 +163,7 @@ async function getInstallationToken(env) {
 
   if (!reposRes.ok) {
     const text = await reposRes.text();
-    throw new Error(text || "Could not read repositories for GitHub App installation.");
+    throw new Error(`Read installation repositories failed (${reposRes.status}): ${text || "no response body"}`);
   }
 
   const reposPayload = await reposRes.json();
@@ -180,7 +180,8 @@ async function getInstallationToken(env) {
   });
 
   if (!tokenRes.ok) {
-    throw new Error("Could not create GitHub App token.");
+    const text = await tokenRes.text();
+    throw new Error(`Create installation token failed (${tokenRes.status}): ${text || "no response body"}`);
   }
 
   const tokenPayload = await tokenRes.json();
@@ -211,15 +212,32 @@ async function healthCheck(env) {
       github = { response: body };
     }
 
+    if (!response.ok) {
+      return jsonResponse({
+        ok: false,
+        githubStatus: response.status,
+        configuredAppIdentifier: appIdentifier,
+        keyFormat,
+        keyFingerprint: await sha256(pem),
+        githubAppId: github.id || null,
+        githubClientId: github.client_id || null,
+        githubMessage: github.message || null,
+      }, 502);
+    }
+
+    const installationToken = await getInstallationToken(env);
+    const repoFile = await getRepoFile(installationToken, env, "initial-data.json");
+
     return jsonResponse({
-      ok: response.ok,
+      ok: true,
       githubStatus: response.status,
       configuredAppIdentifier: appIdentifier,
       keyFormat,
       keyFingerprint: await sha256(pem),
       githubAppId: github.id || null,
       githubClientId: github.client_id || null,
-      githubMessage: github.message || null,
+      repositoryRead: Boolean(repoFile.sha),
+      repositoryFile: "initial-data.json",
     }, response.ok ? 200 : 502);
   } catch (error) {
     return jsonResponse({
@@ -238,7 +256,8 @@ async function getRepoFile(token, env, path) {
   });
 
   if (!res.ok) {
-    throw new Error(`Could not read ${path} from repo.`);
+    const text = await res.text();
+    throw new Error(`Read ${path} from repository failed (${res.status}): ${text || "no response body"}`);
   }
 
   return res.json();
