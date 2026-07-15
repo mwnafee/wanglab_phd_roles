@@ -111,5 +111,26 @@
     "Hao": "gongh2",
     "Marshal": "shawkm"
   },
-  "labRatioExclusions": {}
+  "labRatioExclusions": {
+    "Yuxuan Liang": [
+      "1st Fall",
+      "1st Spring",
+      "4th Spring"
+    ],
+    "Manik": [
+      "1st Fall",
+      "1st Spring",
+      "1st Summer",
+      "2nd Fall",
+      "2nd Spring"
+    ],
+    "Zabirul": [
+      "1st Fall",
+      "1st Spring",
+      "1st Summer",
+      "2nd Fall",
+      "2nd Spring",
+      "2nd Summer"
+    ]
+  }
 }
