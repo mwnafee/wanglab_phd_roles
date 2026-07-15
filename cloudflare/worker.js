@@ -157,8 +157,20 @@ async function getInstallationToken(env) {
     throw new Error(`No GitHub App installation was found for ${env.GITHUB_REPO}.`);
   }
 
-  const reposRes = await fetch(installation.repositories_url, {
+  const tokenRes = await fetch(`${GITHUB_API}/app/installations/${installation.id}/access_tokens`, {
+    method: "POST",
     headers: githubHeaders(jwt),
+  });
+
+  if (!tokenRes.ok) {
+    const text = await tokenRes.text();
+    throw new Error(`Create installation token failed (${tokenRes.status}): ${text || "no response body"}`);
+  }
+
+  const tokenPayload = await tokenRes.json();
+  const token = tokenPayload.token;
+  const reposRes = await fetch(`${GITHUB_API}/installation/repositories`, {
+    headers: githubHeaders(token),
   });
 
   if (!reposRes.ok) {
@@ -174,18 +186,7 @@ async function getInstallationToken(env) {
     throw new Error(`GitHub App installation does not include ${env.GITHUB_REPO}.`);
   }
 
-  const tokenRes = await fetch(`${GITHUB_API}/app/installations/${installation.id}/access_tokens`, {
-    method: "POST",
-    headers: githubHeaders(jwt),
-  });
-
-  if (!tokenRes.ok) {
-    const text = await tokenRes.text();
-    throw new Error(`Create installation token failed (${tokenRes.status}): ${text || "no response body"}`);
-  }
-
-  const tokenPayload = await tokenRes.json();
-  return tokenPayload.token;
+  return token;
 }
 
 // This endpoint intentionally exposes no secret material. It lets an admin
