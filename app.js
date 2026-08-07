@@ -182,8 +182,7 @@ function buildExclusionRules(config) {
   }
 
   return {
-    Manik: new Set(terms.slice(0, 4)),
-    Zabirul: new Set(terms.slice(0, 7)),
+    "Yuxuan Liang": new Set(["1st Fall", "1st Spring", "4th Spring"]),
   };
 }
 
