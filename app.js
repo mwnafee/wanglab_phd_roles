@@ -353,12 +353,15 @@ function renderExcelView() {
   const head = [
     "<tr>",
     "<th>Nickname</th>",
+    "<th>Ratio</th>",
     ...terms.map((term) => `<th>${escapeHtml(term)}</th>`),
     "</tr>",
   ].join("");
 
   const rows = state.students
     .map((student) => {
+      const metrics = getStudentMetrics(student);
+      const ratioCell = `<td class="ratio-summary-cell">${formatRatio(metrics.taCount, metrics.raCount)}</td>`;
       const cells = terms.map((term) => {
         const role = student.roles[term] || "";
         const excluded = isExcluded(student.name, term);
@@ -385,7 +388,7 @@ function renderExcelView() {
         return `<td class="${classes.join(" ")}">${role || "-"}</td>`;
       });
 
-      return `<tr><td class="student-name">${escapeHtml(student.name)}</td>${cells.join("")}</tr>`;
+      return `<tr><td class="student-name">${escapeHtml(student.name)}</td>${ratioCell}${cells.join("")}</tr>`;
     })
     .join("");
 

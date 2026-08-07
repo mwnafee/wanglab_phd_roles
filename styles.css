@@ -235,14 +235,32 @@ th:first-child,
 td.student-name {
   position: sticky;
   left: 0;
-  z-index: 1;
+  z-index: 2;
   width: 140px;
   text-align: left;
   background: #f9fbfc;
 }
 
 th:first-child {
+  z-index: 3;
+}
+
+thead th:nth-child(2),
+td.ratio-summary-cell {
+  position: sticky;
+  left: 140px;
   z-index: 2;
+  width: 90px;
+  background: #f9fbfc;
+}
+
+thead th:nth-child(2) {
+  z-index: 3;
+  background: #e7edf2;
+}
+
+td.ratio-summary-cell {
+  font-weight: 700;
 }
 
 .role-cell {
