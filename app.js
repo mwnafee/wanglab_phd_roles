@@ -481,9 +481,23 @@ function renderLabSummary() {
 }
 
 function getStudentMetrics(student) {
-  const values = Object.values(student.roles);
-  const taCount = values.filter((role) => role === "TA").length;
-  const raCount = values.filter((role) => role === "RA").length;
+  let taCount = 0;
+  let raCount = 0;
+
+  terms.forEach((term) => {
+    if (isBeforeJoining(student.name, term)) {
+      return;
+    }
+
+    const role = student.roles[term];
+    if (role === "TA") {
+      taCount += 1;
+    }
+    if (role === "RA") {
+      raCount += 1;
+    }
+  });
+
   const total = taCount + raCount;
 
   return {
