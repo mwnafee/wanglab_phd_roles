@@ -128,13 +128,22 @@ const state = {
 
 const excelView = document.getElementById("excel-view");
 const ratioView = document.getElementById("ratio-view");
+const conferenceView = document.getElementById("conference-view");
 const summaryMount = document.getElementById("lab-ratio-summary");
 const sortControls = document.getElementById("sort-controls");
+const ratioSummaryPanel = document.getElementById("ratio-summary-panel");
+const roleFormPanel = document.getElementById("role-form-panel");
+const conferenceFormPanel = document.getElementById("conference-form-panel");
 const ratioSort = document.getElementById("ratio-sort");
 const nicknameSelect = document.getElementById("nickname");
 const semesterSelect = document.getElementById("semester");
 const roleForm = document.getElementById("role-form");
 const formMessage = document.getElementById("form-message");
+const conferenceForm = document.getElementById("conference-form");
+const conferenceNicknameSelect = document.getElementById("conference-nickname");
+const conferenceMessage = document.getElementById("conference-message");
+
+let conferenceVisits = [];
 
 bootstrap();
 
@@ -158,6 +167,7 @@ async function loadInitialData() {
     if (Array.isArray(payload.terms) && Array.isArray(payload.students)) {
       terms = payload.terms;
       seedStudents = payload.students;
+      conferenceVisits = Array.isArray(payload.conferenceVisits) ? payload.conferenceVisits : [];
       if (payload.credentials && typeof payload.credentials === "object") {
         credentials = payload.credentials;
         nicknames = Object.keys(credentials);
@@ -182,7 +192,8 @@ function buildExclusionRules(config) {
   }
 
   return {
-    "Yuxuan Liang": new Set(["1st Fall", "1st Spring", "4th Spring"]),
+    Manik: new Set(terms.slice(0, 4)),
+    Zabirul: new Set(terms.slice(0, 7)),
   };
 }
 
@@ -240,9 +251,11 @@ function saveStudents() {
 }
 
 function populateSelects() {
-  nicknameSelect.innerHTML = nicknames
+  const options = nicknames
     .map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`)
     .join("");
+  nicknameSelect.innerHTML = options;
+  conferenceNicknameSelect.innerHTML = options;
 
   semesterSelect.innerHTML = terms
     .map((term) => `<option value="${escapeHtml(term)}">${escapeHtml(term)}</option>`)
@@ -261,6 +274,7 @@ function bindViewSwitch() {
   });
 
   ratioSort.addEventListener("change", renderRatioView);
+  conferenceForm.addEventListener("submit", handleConferenceSubmit);
 }
 
 function bindForm() {
@@ -340,28 +354,113 @@ function setFormMessage(text, isSuccess) {
 
 function render() {
   const showingExcel = state.currentView === "excel";
+  const showingRatio = state.currentView === "ratio";
   excelView.hidden = !showingExcel;
-  ratioView.hidden = showingExcel;
-  sortControls.hidden = showingExcel;
+  ratioView.hidden = !showingRatio;
+  conferenceView.hidden = state.currentView !== "conferences";
+  sortControls.hidden = !showingRatio;
+  ratioSummaryPanel.hidden = !showingExcel && !showingRatio;
+  roleFormPanel.hidden = !showingExcel && !showingRatio;
+  conferenceFormPanel.hidden = state.currentView !== "conferences";
 
   renderExcelView();
   renderRatioView();
   renderLabSummary();
+  renderConferenceView();
+}
+
+function renderConferenceView() {
+  const counts = Object.fromEntries(nicknames.map((name) => [name, 0]));
+  conferenceVisits.forEach((visit) => {
+    if (Object.hasOwn(counts, visit.nickname)) counts[visit.nickname] += 1;
+  });
+
+  const rows = nicknames.map((name) => {
+    const visits = conferenceVisits
+      .filter((visit) => visit.nickname === name)
+      .sort((a, b) => String(b.dates).localeCompare(String(a.dates)));
+    return `
+      <section class="conference-student">
+        <div class="conference-student-heading">
+          <h2>${escapeHtml(name)}</h2>
+          <strong>${counts[name]} ${counts[name] === 1 ? "visit" : "visits"}</strong>
+        </div>
+        ${visits.length ? `
+          <ul class="conference-list">
+            ${visits.map((visit) => `
+              <li class="conference-item">
+                <strong>${escapeHtml(visit.conferenceName)}</strong>
+                <span>${escapeHtml(visit.dates)}</span>
+                <span>${escapeHtml(visit.location)}</span>
+              </li>
+            `).join("")}
+          </ul>
+        ` : `<p class="conference-empty">No visits recorded</p>`}
+      </section>
+    `;
+  }).join("");
+
+  conferenceView.innerHTML = `<div class="conference-directory">${rows}</div>`;
+}
+
+async function handleConferenceSubmit(event) {
+  event.preventDefault();
+  const payload = {
+    type: "conference",
+    nickname: conferenceNicknameSelect.value,
+    conferenceName: document.getElementById("conference-name").value.trim(),
+    dates: document.getElementById("conference-dates").value.trim(),
+    location: document.getElementById("conference-location").value.trim(),
+    rcsId: document.getElementById("conference-rcs-id").value.trim(),
+  };
+
+  if (payload.rcsId !== credentials[payload.nickname]) {
+    setConferenceMessage("RCS ID did not match the selected student. Visit not saved.", false);
+    return;
+  }
+  if (!payload.conferenceName || !payload.dates || !payload.location) {
+    setConferenceMessage("Enter the conference name, dates, and location.", false);
+    return;
+  }
+
+  if (APP_CONFIG.updateUrl) {
+    try {
+      setConferenceMessage("Saving visit...", true);
+      const response = await fetch(APP_CONFIG.updateUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Visit not saved.");
+      if (result.visit) conferenceVisits.push(result.visit);
+      conferenceForm.reset();
+      renderConferenceView();
+      setConferenceMessage(result.message || "Conference visit saved to GitHub.", true);
+    } catch (error) {
+      setConferenceMessage(error.message || "Visit not saved.", false);
+    }
+    return;
+  }
+
+  setConferenceMessage("Shared conference updates are not configured.", false);
+}
+
+function setConferenceMessage(text, isSuccess) {
+  conferenceMessage.textContent = text;
+  conferenceMessage.className = `form-message ${isSuccess ? "success" : "error"}`;
 }
 
 function renderExcelView() {
   const head = [
     "<tr>",
     "<th>Nickname</th>",
-    "<th>Ratio</th>",
     ...terms.map((term) => `<th>${escapeHtml(term)}</th>`),
     "</tr>",
   ].join("");
 
   const rows = state.students
     .map((student) => {
-      const metrics = getStudentMetrics(student);
-      const ratioCell = `<td class="ratio-summary-cell">${formatRatio(metrics.taCount, metrics.raCount)}</td>`;
       const cells = terms.map((term) => {
         const role = student.roles[term] || "";
         const excluded = isExcluded(student.name, term);
@@ -388,7 +487,7 @@ function renderExcelView() {
         return `<td class="${classes.join(" ")}">${role || "-"}</td>`;
       });
 
-      return `<tr><td class="student-name">${escapeHtml(student.name)}</td>${ratioCell}${cells.join("")}</tr>`;
+      return `<tr><td class="student-name">${escapeHtml(student.name)}</td>${cells.join("")}</tr>`;
     })
     .join("");
 
@@ -481,23 +580,9 @@ function renderLabSummary() {
 }
 
 function getStudentMetrics(student) {
-  let taCount = 0;
-  let raCount = 0;
-
-  terms.forEach((term) => {
-    if (isBeforeJoining(student.name, term)) {
-      return;
-    }
-
-    const role = student.roles[term];
-    if (role === "TA") {
-      taCount += 1;
-    }
-    if (role === "RA") {
-      raCount += 1;
-    }
-  });
-
+  const values = Object.values(student.roles);
+  const taCount = values.filter((role) => role === "TA").length;
+  const raCount = values.filter((role) => role === "RA").length;
   const total = taCount + raCount;
 
   return {

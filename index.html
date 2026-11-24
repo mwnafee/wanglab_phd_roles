@@ -21,6 +21,7 @@
           <div class="view-switch" role="tablist" aria-label="Dashboard views">
             <button class="view-button is-active" id="excel-view-button" data-view="excel" type="button">Excel View</button>
             <button class="view-button" id="ratio-view-button" data-view="ratio" type="button">Ratio View</button>
+            <button class="view-button" id="conference-view-button" data-view="conferences" type="button">Conferences</button>
           </div>
 
           <div class="sort-controls" id="sort-controls" hidden>
@@ -43,11 +44,12 @@
         <section class="panel main-panel">
           <div id="excel-view" class="view-panel"></div>
           <div id="ratio-view" class="view-panel" hidden></div>
+          <div id="conference-view" class="view-panel" hidden></div>
         </section>
       </section>
 
       <aside class="sidebar">
-        <section class="panel summary-panel">
+        <section class="panel summary-panel" id="ratio-summary-panel">
           <h2>TA / RA Ratio</h2>
           <div id="lab-ratio-summary"></div>
           <p class="summary-note">
@@ -55,7 +57,7 @@
           </p>
         </section>
 
-        <section class="panel form-panel">
+        <section class="panel form-panel" id="role-form-panel">
           <h2>Student Entry</h2>
           <form id="role-form">
             <label for="nickname">Nickname</label>
@@ -77,12 +79,37 @@
           </form>
           <p id="form-message" class="form-message" aria-live="polite"></p>
         </section>
+
+        <section class="panel form-panel" id="conference-form-panel" hidden>
+          <h2>Add Conference Visit</h2>
+          <form id="conference-form">
+            <label for="conference-nickname">Student</label>
+            <select id="conference-nickname" name="nickname" required></select>
+
+            <label for="conference-name">Conference name</label>
+            <input id="conference-name" name="conferenceName" required maxlength="240">
+
+            <label for="conference-dates">Visit dates</label>
+            <input id="conference-dates" name="dates" required maxlength="100" placeholder="e.g. March 12-15, 2027">
+
+            <label for="conference-location">Location</label>
+            <input id="conference-location" name="location" required maxlength="160" placeholder="City, State, Country">
+
+            <label for="conference-rcs-id">RCS ID</label>
+            <input id="conference-rcs-id" name="rcsId" type="password" autocomplete="off" required>
+
+            <button class="submit-button" type="submit">Save Visit</button>
+          </form>
+          <p id="conference-message" class="form-message" aria-live="polite"></p>
+        </section>
       </aside>
     </main>
   </div>
 
   <script>
-    window.APP_CONFIG = {};
+    window.APP_CONFIG = {
+      updateUrl: "https://silent-queen-b5fe.wasifbd2016.workers.dev/"
+    };
   </script>
   <script src="app.js"></script>
 </body>

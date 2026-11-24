@@ -132,6 +132,60 @@ h2 {
   font-weight: 700;
 }
 
+.conference-directory {
+  display: grid;
+  gap: 14px;
+}
+
+.conference-student {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfd;
+}
+
+.conference-student-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.conference-student-heading h2 {
+  margin: 0;
+}
+
+.conference-student-heading strong {
+  color: var(--accent-dark);
+}
+
+.conference-list {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.conference-item {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
+}
+
+.conference-item span,
+.conference-empty {
+  color: var(--muted);
+}
+
+.conference-empty {
+  margin: 12px 0 0;
+}
+
 .view-button.is-active {
   background: var(--accent);
   color: white;
@@ -235,32 +289,14 @@ th:first-child,
 td.student-name {
   position: sticky;
   left: 0;
-  z-index: 2;
+  z-index: 1;
   width: 140px;
   text-align: left;
   background: #f9fbfc;
 }
 
 th:first-child {
-  z-index: 3;
-}
-
-thead th:nth-child(2),
-td.ratio-summary-cell {
-  position: sticky;
-  left: 140px;
   z-index: 2;
-  width: 90px;
-  background: #f9fbfc;
-}
-
-thead th:nth-child(2) {
-  z-index: 3;
-  background: #e7edf2;
-}
-
-td.ratio-summary-cell {
-  font-weight: 700;
 }
 
 .role-cell {
@@ -460,6 +496,13 @@ label {
   }
 
   .view-button {
-    width: 50%;
+    width: auto;
+    flex: 1;
+    min-width: 0;
+    padding-inline: 8px;
+  }
+
+  .conference-student-heading {
+    align-items: flex-start;
   }
 }
