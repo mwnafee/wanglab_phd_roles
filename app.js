@@ -25,7 +25,6 @@ let credentials = {
   Manik: "manikm",
   Zabirul: "islamm11",
   Wasif: "nafeem",
-  Hao: "gongh2",
   Marshal: "shawkm",
 };
 
@@ -102,12 +101,6 @@ let seedStudents = [
     roles: {
       "1st Fall": "RA",
       "1st Spring": "RA",
-    },
-  },
-  {
-    name: "Hao",
-    roles: {
-      "1st Fall": "RA",
     },
   },
   {
