@@ -155,7 +155,10 @@ async function bootstrap() {
 
 async function loadInitialData() {
   try {
-    const response = await fetch("initial-data.json", { cache: "no-store" });
+    const dataUrl = APP_CONFIG.updateUrl
+      ? new URL("data", APP_CONFIG.updateUrl).toString()
+      : "initial-data.json";
+    const response = await fetch(dataUrl, { cache: "no-store" });
     if (!response.ok) {
       throw new Error("Initial data unavailable.");
     }
