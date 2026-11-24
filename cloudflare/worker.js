@@ -288,6 +288,10 @@ async function updateRepoFile(token, env, path, content, sha, message) {
 
 async function handleUpdate(request, env) {
   const payload = await request.json();
+  if (payload.type === "conference") {
+    return handleConferenceUpdate(payload, env);
+  }
+
   const nickname = String(payload.nickname || "").trim();
   const semester = String(payload.semester || "").trim();
   const role = String(payload.role || "").trim().toUpperCase();
@@ -329,6 +333,43 @@ async function handleUpdate(request, env) {
     message: "Role saved to GitHub.",
     updated: { nickname, semester, role },
   });
+}
+
+async function handleConferenceUpdate(payload, env) {
+  const nickname = String(payload.nickname || "").trim();
+  const conferenceName = String(payload.conferenceName || "").trim();
+  const dates = String(payload.dates || "").trim();
+  const location = String(payload.location || "").trim();
+  const rcsId = String(payload.rcsId || "").trim();
+
+  const token = await getInstallationToken(env);
+  const initialFile = await getRepoFile(token, env, "initial-data.json");
+  const data = JSON.parse(atob(initialFile.content.replace(/\n/g, "")));
+
+  if (!data.credentials || data.credentials[nickname] !== rcsId) {
+    return jsonResponse({ error: "RCS ID did not match nickname." }, 403);
+  }
+  if (!(data.students || []).some((entry) => entry.name === nickname)) {
+    return jsonResponse({ error: "Student not found." }, 404);
+  }
+  if (!conferenceName || conferenceName.length > 240 || !dates || dates.length > 100 || !location || location.length > 160) {
+    return jsonResponse({ error: "Conference name, dates, or location is invalid." }, 400);
+  }
+
+  const visit = { nickname, conferenceName, dates, location };
+  data.conferenceVisits = Array.isArray(data.conferenceVisits) ? data.conferenceVisits : [];
+  data.conferenceVisits.push(visit);
+  const nextContent = `${JSON.stringify(data, null, 2)}\n`;
+  await updateRepoFile(
+    token,
+    env,
+    "initial-data.json",
+    nextContent,
+    initialFile.sha,
+    `Add conference visit for ${nickname}`
+  );
+
+  return jsonResponse({ ok: true, message: "Conference visit saved to GitHub.", visit });
 }
 
 export default {
