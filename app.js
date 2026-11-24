@@ -123,9 +123,14 @@ let beforeJoiningRules = buildBeforeJoiningRules();
 
 const state = {
   students: [],
+  currentSection: "allotment",
   currentView: "excel",
 };
 
+const allotmentSection = document.getElementById("allotment-section");
+const allotmentSidebar = document.getElementById("allotment-sidebar");
+const conferenceSection = document.getElementById("conference-section");
+const allotmentLegend = document.getElementById("allotment-legend");
 const excelView = document.getElementById("excel-view");
 const ratioView = document.getElementById("ratio-view");
 const conferenceView = document.getElementById("conference-view");
@@ -133,7 +138,6 @@ const summaryMount = document.getElementById("lab-ratio-summary");
 const sortControls = document.getElementById("sort-controls");
 const ratioSummaryPanel = document.getElementById("ratio-summary-panel");
 const roleFormPanel = document.getElementById("role-form-panel");
-const conferenceFormPanel = document.getElementById("conference-form-panel");
 const ratioSort = document.getElementById("ratio-sort");
 const nicknameSelect = document.getElementById("nickname");
 const semesterSelect = document.getElementById("semester");
@@ -263,11 +267,25 @@ function populateSelects() {
 }
 
 function bindViewSwitch() {
+  document.querySelectorAll(".section-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.currentSection = button.dataset.section;
+      document.querySelectorAll(".section-button").forEach((node) => {
+        const selected = node === button;
+        node.classList.toggle("is-active", selected);
+        node.setAttribute("aria-selected", String(selected));
+      });
+      render();
+    });
+  });
+
   document.querySelectorAll(".view-button").forEach((button) => {
     button.addEventListener("click", () => {
       state.currentView = button.dataset.view;
       document.querySelectorAll(".view-button").forEach((node) => {
-        node.classList.toggle("is-active", node === button);
+        const selected = node === button;
+        node.classList.toggle("is-active", selected);
+        node.setAttribute("aria-selected", String(selected));
       });
       render();
     });
@@ -355,13 +373,16 @@ function setFormMessage(text, isSuccess) {
 function render() {
   const showingExcel = state.currentView === "excel";
   const showingRatio = state.currentView === "ratio";
+  const showingAllotment = state.currentSection === "allotment";
+  allotmentSection.hidden = !showingAllotment;
+  allotmentSidebar.hidden = !showingAllotment;
+  allotmentLegend.hidden = !showingAllotment;
+  conferenceSection.hidden = showingAllotment;
   excelView.hidden = !showingExcel;
   ratioView.hidden = !showingRatio;
-  conferenceView.hidden = state.currentView !== "conferences";
-  sortControls.hidden = !showingRatio;
-  ratioSummaryPanel.hidden = !showingExcel && !showingRatio;
-  roleFormPanel.hidden = !showingExcel && !showingRatio;
-  conferenceFormPanel.hidden = state.currentView !== "conferences";
+  sortControls.hidden = !showingAllotment || !showingRatio;
+  ratioSummaryPanel.hidden = !showingAllotment;
+  roleFormPanel.hidden = !showingAllotment;
 
   renderExcelView();
   renderRatioView();
